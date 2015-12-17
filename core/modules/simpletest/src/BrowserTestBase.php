@@ -41,11 +41,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Drupal\Tests\yourmodule\Functional namespace and live in the
  * modules/yourmodule/Tests/Functional directory.
  *
- * All BrowserTestBase tests must have two annotations to ensure process
- * isolation:
- * - @runTestsInSeparateProcesses
- * - @preserveGlobalState disabled
- *
  * @ingroup testing
  *
  * @see \Drupal\simpletest\WebTestBase
@@ -217,6 +212,19 @@ abstract class BrowserTestBase extends \PHPUnit_Framework_TestCase {
   protected $mink;
 
   /**
+   * {@inheritdoc}
+   *
+   * Browser tests are run in separate processes to prevent collisions between
+   * code that may be loaded by tests.
+   */
+  protected $runTestInSeparateProcess = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $preserveGlobalState = FALSE;
+
+  /**
    * Initializes Mink sessions.
    */
   protected function initMink() {
@@ -291,7 +299,7 @@ abstract class BrowserTestBase extends \PHPUnit_Framework_TestCase {
     // coverage against.
     $base_url = getenv('SIMPLETEST_BASE_URL');
     if (!$base_url) {
-      $this->markTestSkipped(
+      throw new \Exception(
         'You must provide a SIMPLETEST_BASE_URL environment variable to run some PHPUnit based functional tests.'
       );
     }
